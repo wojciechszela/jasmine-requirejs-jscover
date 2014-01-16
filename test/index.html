@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Jasmine Spec Runner</title>
+    <link rel="shortcut icon" type="image/png" href="../tools/jasmine/lib/jasmine-2.0.0/jasmine_favicon.png" />
+    <link rel="stylesheet" href="../tools/jasmine/lib/jasmine-2.0.0/jasmine.css">
+</head>
+    <body>
+        <div id="sandbox" style="overflow:hidden; height:1px;"></div>
+        <script src="../source/vendor/requirejs/require.js"></script>
+        <script src="../source/config/require.js"></script>
+        <script type="text/javascript">
+        require.config({
+            baseUrl : '../source',
+            paths   : {
+                test           : '../test',
+                application    : 'application',
+                jasmine        : '../tools/jasmine/lib/jasmine-2.0.0/jasmine',
+                jasminehtml    : '../tools/jasmine/lib/jasmine-2.0.0/jasmine-html',
+                jasmineboot    : '../tools/jasmine/lib/jasmine-2.0.0/boot',
+                jasmineconsole : '../tools/jasmine/lib/jasmine-2.0.0/console'
+            },
+            shim : {
+                jasmine : {
+                  exports : 'jasmine'
+                },
+                jasminehtml: {
+                  deps    : ['jasmine'],
+                  exports : 'jasmineRequire'
+                },
+                jasmineboot : {
+                    deps    : ['jasmine', 'jasminehtml'],
+                    exports : 'jasmine'
+                },
+                jasmineconsole : {
+                    deps    : ['jasmine', 'jasminehtml', 'jasmineboot'],
+                    exports : 'getJasmineRequireObj'
+                }
+            }
+        });
+        
+        require(['jasmineboot', 'jasmineconsole'], function (jasmine, getJasmineRequireObj) {
+            require(['test/index'], function (specs) {
+                var callPhantomFunc = window.callPhantom || window.parent.callPhantom;
+                
+                if (callPhantomFunc) {
+                    var print = function (message) {
+                        callPhantomFunc({
+                            message : 'jasminelog',
+                            data    : {
+                                message : message
+                            }
+                        });
+                    };
+                    var consoleReporterConstructor = getJasmineRequireObj().ConsoleReporter();
+                    var consoleReporter = new consoleReporterConstructor({
+                        print : print,
+                        timer : new window.jasmine.Timer()
+                        
+                    });
+                    window.jasmine.getEnv().addReporter(consoleReporter);
+                }
+
+                window.onload();
+            });
+        });
+        </script>
+    </body>
+</html>

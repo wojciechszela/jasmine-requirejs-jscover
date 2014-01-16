@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="JavaScript unit tests" default="help" basedir=".">
+    <description>JavaScript unit tests</description>
+
+    <property environment="env" />
+
+    <property name="build.source" location="${basedir}/source" />
+    <property name="build.target" location="${basedir}/build" />
+    <property name="build.tools"  location="${basedir}/tools" />
+
+    <target name="help">
+        <echo>Usage:</echo>
+        <echo></echo>
+        <echo>Display this help message:</echo>
+        <echo>    ant help</echo>
+        <echo></echo>
+        <echo>Start JSCover:</echo>
+        <echo>(after starting the server open http://localhost:8081)</echo>
+        <echo>    ant startjscover</echo>
+        <echo></echo>
+        <echo>Run unit tests:</echo>
+        <echo>    ant unittest</echo>
+        <echo></echo>
+        <echo>Run unit tests and generate code coverage report:</echo>
+        <echo>    ant unittestandcoverage</echo>
+    </target>
+
+    <target name="cleanup">
+        <delete dir="${build.target}" />
+    </target>
+    
+    <target name="init" depends="cleanup">
+        <mkdir dir="${build.target}" />
+        <mkdir dir="${build.target}/coverage" />
+    </target>
+    
+    <target name="startjscover" depends="init">
+        <java jar="${build.tools}/jscover/JSCover-all.jar" fork="true" spawn="true">
+            <jvmarg value="-Dfile.encoding=UTF-8" />
+            <arg value="-ws" />
+            <arg value="--document-root=." />
+            <arg value="--report-dir=${build.target}/coverage" />
+            <arg value="--no-instrument=build" />
+            <arg value="--no-instrument=source/config" />
+            <arg value="--no-instrument=source/vendor" />
+            <arg value="--no-instrument=test" />
+            <arg value="--no-instrument=tools" />
+            <arg value="--no-function" />
+            <arg value="--port=8081"/>
+        </java>
+        <waitfor maxwait="5" maxwaitunit="second" checkevery="250" checkeveryunit="millisecond" timeoutproperty="failed">
+            <http url="http://localhost:8081/jscoverage.html"/>
+        </waitfor>
+        <fail if="failed" />
+        <echo message="JSCover has been run. URL: http://localhost:8081/jscoverage.html " />
+    </target>
+    
+    <target name="stopjscover">
+        <get src="http://localhost:8081/stop" dest="/dev/null" />
+    </target>
+
+    <target name="unittest" depends="_loadalljs">
+        <exec dir="${basedir}" executable="${build.tools}/phantomjs/bin/phantomjs" failonerror="true">
+            <arg line="${build.tools}/testrunner/phantom-jscover-jasmine.js" />
+            <arg line="./test/index.html" />
+        </exec>
+    </target>
+
+    <target name="unittestandcoverage" depends="_loadalljs">
+        <exec dir="${basedir}" executable="${build.tools}/phantomjs/bin/phantomjs" failonerror="true">
+            <arg line="${build.tools}/testrunner/phantom-jscover-jasmine.js" />
+            <arg line="http://localhost:8081/jscoverage.html?test/index.html" />
+        </exec>
+    </target>
+    
+    <target name="_loadalljs">
+        <path id="id.loadall.js">
+            <fileset dir="${build.source}/application" includes="**/*.js*" />
+        </path>
+        <pathconvert property="prop.loadall.js" refid="id.loadall.js" pathsep="','">
+            <mapper type="regexp" from="^${build.source}/(.*)\.js$" to="\1"/>
+        </pathconvert>
+        <echo file="${build.source}/_application.js">${prop.loadall.js}</echo>
+        <concat destfile="${build.source}/application.js">
+            <header filtering="no" trimleading="yes">require(['</header>
+            <fileset dir="${build.source}" includes="_application.js"/>
+            <footer filtering="no" trimleading="yes">']);</footer>
+        </concat>
+        <delete file="${build.source}/_application.js" />
+    </target>
+</project>

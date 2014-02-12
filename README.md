@@ -1,6 +1,9 @@
 Jasmine 2.0 + RequireJs + (optional) JSCover
 =========================
 
-Works with Linux 64. Support for Linux 32, Mac and Windows comming soon. Meanwhile replace PhantomJS binary to make it work with other OSes.
+Example, working integration of Jasmine 2.0 (unit) tests, including code coverage, with a JavaScript application using RequireJS to define modules. Clone and customize to your needs.
 
-Explanation of how it works: http://wojciechszela.com/blog/2014/01/26/unit-testing-in-javascript-jasmine-2-requirejs-jscover-phantomjs/
+Usage: running "ant" without any parameters will print help with examples.
+
+Setup explanation: http://wojciechszela.com/blog/2014/01/26/unit-testing-in-javascript-jasmine-2-requirejs-jscover-phantomjs/
+

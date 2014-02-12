@@ -7,7 +7,20 @@
     <property name="build.source" location="${basedir}/source" />
     <property name="build.target" location="${basedir}/build" />
     <property name="build.tools"  location="${basedir}/tools" />
-
+    
+    <condition property="phantomPath" value="windows/phantomjs.exe">
+        <os family="windows" />
+    </condition>
+    <condition property="phantomPath" value="mac/phantomjs">
+        <os family="mac" />
+    </condition>
+    <condition property="phantomPath" value="linux32/phantomjs">
+        <os family="unix" arch="i386" />
+    </condition>
+    <condition property="phantomPath" value="linux64/phantomjs">
+        <os family="unix" arch="amd64" />
+    </condition>
+    
     <target name="help">
         <echo>Usage:</echo>
         <echo></echo>
@@ -60,14 +73,14 @@
     </target>
 
     <target name="unittest" depends="_loadalljs">
-        <exec dir="${basedir}" executable="${build.tools}/phantomjs/bin/phantomjs" failonerror="true">
+        <exec dir="${basedir}" executable="${build.tools}/phantomjs/bin/${phantomPath}" failonerror="true">
             <arg line="${build.tools}/testrunner/phantom-jscover-jasmine.js" />
             <arg line="./test/index.html" />
         </exec>
     </target>
 
     <target name="unittestandcoverage" depends="_loadalljs">
-        <exec dir="${basedir}" executable="${build.tools}/phantomjs/bin/phantomjs" failonerror="true">
+        <exec dir="${basedir}" executable="${build.tools}/phantomjs/bin/${phantomPath}" failonerror="true">
             <arg line="${build.tools}/testrunner/phantom-jscover-jasmine.js" />
             <arg line="http://localhost:8081/jscoverage.html?test/index.html" />
         </exec>

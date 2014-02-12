@@ -33,17 +33,16 @@
                 return page.evaluate(function() {
                     var reporter = window.jsApiReporter;
 
-                    if (!reporter && window.frames[0] && window.frames[0].jsApiReporter) {
+                    if (window.frames[0]) {
                         reporter = window.frames[0].jsApiReporter;
                     }
-
                     return reporter && reporter.finished;
                 });
             }, function() {
                 page.evaluate(function() {
-                    var jscoverage_report;
+                    var jscoverage_report = window.jscoverage_report;
 
-                    if (!jscoverage_report && window.frames[0] && window.frames[0].jscoverage_report) {
+                    if (window.frames[0]) {
                         jscoverage_report = window.frames[0].jscoverage_report;
                     }
 

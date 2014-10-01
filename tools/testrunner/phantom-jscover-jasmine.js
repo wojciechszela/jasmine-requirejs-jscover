@@ -17,11 +17,11 @@
 
     var url  = phantom.args[0];
     var page = require('webpage').create();
-    var fs   = require('fs');
+    var system = require('system');
 
     page.onCallback = function(data) {
         if ('jasminelog' === data.message) {
-            fs.write('/dev/stdout', data.data.message, 'w');
+            system.stdout.write( data.data.message);
         }
     };
 

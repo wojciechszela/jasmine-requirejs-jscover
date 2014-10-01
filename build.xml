@@ -90,8 +90,10 @@
         <path id="id.loadall.js">
             <fileset dir="${build.source}/application" includes="**/*.js*" />
         </path>
-        <pathconvert property="prop.loadall.js" refid="id.loadall.js" pathsep="','">
-            <mapper type="regexp" from="^${build.source}/(.*)\.js$" to="\1"/>
+        <pathconvert property="prop.loadall.js" refid="id.loadall.js" pathsep="','" dirsep="/">
+            <filtermapper>
+                <replacestring from="${build.source}/" to=""/>
+            </filtermapper>
         </pathconvert>
         <echo file="${build.source}/_application.js">${prop.loadall.js}</echo>
         <concat destfile="${build.source}/application.js">
